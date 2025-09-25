@@ -1,153 +1,725 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3kawi Cfx Finder</title>
-<link rel="icon" href="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024" type="image/png">
-<style>
-  body {margin:0; padding:0; background:#00101a; color:white; font-family: Arial, sans-serif; overflow-x:hidden;}
-  
-  header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 20px;
-    background-color:#120033;
-  }
-  .home-link img {width:40px; height:40px; cursor:pointer; display:block;}
-  .join-btn {
-    background-color:#4c00ff;
-    color:white;
-    padding:8px 15px;
-    border-radius:5px;
-    text-decoration:none;
-    font-weight:bold;
-    transition: background-color 0.3s;
-  }
-  .join-btn:hover {background-color:#4c00ff;}
-
-  main {
-    text-align:center;
-    margin:40px auto;
-    max-width:500px;
-    background:rgba(0,0,0,0.6);
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 0 20px rgba(111, 0, 255, 0.4);
-  }
-  .header-image {max-width:120px; margin:0 auto 15px; display:block; border-radius:50%;}
-  h1 {color:#4c00ff; text-shadow:0 0 10px rgba(55, 0, 255, 0.3); margin-bottom:20px;}
-
-  .input-container {display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
-  input {flex:1; padding:10px; border-radius:8px; border:none; min-width:180px;}
-  button {cursor:pointer; background:#4c00ff; color:white; padding:10px 15px; border-radius:8px; border:none; transition:0.3s;}
-  button:hover {background:#4c00ff;}
-
-  .info-box {margin-top:10px; padding:12px; background:rgba(0,0,0,0.5); border-radius:8px; font-size:15px; min-height:40px;}
-
-  #customPopup {
-    display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:rgba(0,0,0,0.9); padding:20px; border-radius:12px; z-index:1000; color:white; max-width:90%;
-  }
-  .close-btn {margin-top:10px; padding:8px 12px; cursor:pointer; background:#4c00ff; border:none; border-radius:8px;}
-  .close-btn:hover {background:#4c00ff;}
-
-  /* Rain canvas */
-  #rainCanvas {position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;}
-
-  /* YouTube hidden player */
-  #player {position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;}
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
 </style>
-</head>
-<body>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About 3kawi !!</title>
+  <link rel="icon" href="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024">
+  <style>
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    </style></head><body><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnp3Y2JmcDF6b25hamUyaHF2bHdhZWZqc294YzVrMnJ0ZWVnYTZteiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zleSBdKyVFUekD7SvV/giphy.gif" alt="GIF" class="corner-gif">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
 
-<canvas id="rainCanvas"></canvas>
-
-<header>
-  <a href="https://guns.lol/o.y" class="home-link" title="qo">
-    <img src="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024" alt="qo">
-  </a>
-  <a href="https://discord.gg/8J5ZFx5VUJ" class="join-btn" target="_blank">Join Mr. Store !</a>
-</header>
-
-<main>
-  <img src="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024" alt="Banner" class="header-image">
-  <h1>3kawi Cfx Finder</h1>
-  <div class="input-container">
-    <input type="text" id="cfxUrl" placeholder="Enter CFX link (cfx.re/join/anycode)">
-    <button onclick="getServerIP()">Find IP</button>
-  </div>
-  <div class="info-box" id="result">Enter The Cfx Code To Show IP & Port...</div>
-</main>
-
-<!-- YouTube hidden player -->
-<div id="player"></div>
-
-<script src="https://www.youtube.com/iframe_api"></script>
-<script>
-  // Rain effect
-  const rainCanvas = document.getElementById('rainCanvas');
-  const ctx = rainCanvas.getContext('2d');
-  rainCanvas.width = window.innerWidth;
-  rainCanvas.height = window.innerHeight;
-
-  const raindrops = [];
-  for(let i=0; i<100; i++){
-    raindrops.push({x:Math.random()*rainCanvas.width, y:Math.random()*rainCanvas.height, length:10+Math.random()*20, speed:2+Math.random()*2});
-  }
-
-  function animateRain(){
-    ctx.clearRect(0,0,rainCanvas.width,rainCanvas.height);
-    ctx.strokeStyle='rgba(255,255,255,0.2)';
-    ctx.lineWidth=1;
-    raindrops.forEach(drop=>{
-      ctx.beginPath();
-      ctx.moveTo(drop.x, drop.y);
-      ctx.lineTo(drop.x, drop.y + drop.length);
-      ctx.stroke();
-      drop.y += drop.speed;
-      if(drop.y > rainCanvas.height) drop.y = -drop.length;
-    });
-    requestAnimationFrame(animateRain);
-  }
-  animateRain();
-  window.addEventListener('resize', ()=>{
-    rainCanvas.width = window.innerWidth;
-    rainCanvas.height = window.innerHeight;
-  });
-
-  // البحث عن IP و Port
-  function getServerIP(){
-    const input = document.getElementById('cfxUrl').value.trim();
-    const resultBox = document.getElementById('result');
-
-    if(!input || !input.includes("cfx.re/join/")){
-      resultBox.innerHTML = "Please enter a valid CFX link!";
-      return;
+    /* إعدادات عامة */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    const fakeIP = "123.456.78.90";
-    const fakePort = "30120";
+    body {
+      font-family: 'Inter', sans-serif;
+      color: white;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #0a0a0a 0%, #0b051a 50%, #0a0a0a 100%);
+      cursor: url('https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024'), auto;
+    }
 
-    resultBox.innerHTML = `<strong>Server IP:</strong> ${fakeIP}<br><strong>Port:</strong> ${fakePort}`;
+a, button, .link-btn, .links a:hover {
+  cursor: url('https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024'), auto;
+}
+
+
+.visitor-counter {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  z-index: 999;
+  opacity: 0.9;
+}
+
+.visitor-counter img {
+  height: 28px;
+  filter: drop-shadow(0 0 4px rgb(76, 0, 255));
+}
+
+
+
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      opacity: 0.3;
+      filter: brightness(0.4) contrast(1.2);
+    }
+
+
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background-image: 
+        linear-gradient(rgba(89, 0, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(98, 0, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+
+    #mouseEffect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+
+    .card {
+      position: relative;
+      padding: 40px;
+      border-radius: 25px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      background: rgba(12, 0, 0, 0.7);
+      border: 2px solid transparent;
+      backdrop-filter: blur(20px);
+      box-shadow: 
+        0 20px 40px rgba(89, 0, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: cardFloat 6s ease-in-out infinite;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 25px;
+      padding: 2px;
+      background: linear-gradient(45deg, #4c00ff, #4c00ff, #4c00ff, #4c00ff);
+      background-size: 400% 400%;
+      animation: gradientRotate 3s ease infinite;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(0.5deg); }
+    }
+
+    @keyframes gradientRotate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+
+    .avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 4px solid #4c00ff;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(98, 0, 255, 0.3);
+    }
+
+    .avatar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(76, 0, 255, 0.3), transparent);
+      animation: avatarShine 3s ease-in-out infinite;
+    }
+
+    @keyframes avatarShine {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .avatar:hover {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 15px 40px rgba(68, 0, 255, 0.5);
+    }
+
+
+    h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #4c00ff, #9c66ff, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(89, 0, 255, 0.5);
+      animation: textGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes textGlow {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.2); }
+    }
+
+
+    .bio {
+      font-size: 16px;
+      color: #cccccc;
+      margin-bottom: 30px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .links a {
+      position: relative;
+      display: block;
+      background: linear-gradient(135deg, #4c00ff, #000000);
+      color: white;
+      text-decoration: none;
+      padding: 15px 25px;
+      border-radius: 15px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3s);
+    }
+
+    .links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .links a:hover::before {
+      left: 100%;
+    }
+
+    .links a:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(98, 0, 255, 0.5);
+    }
+
+    .links a:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+
+    .links a:nth-child(1) { animation-delay: 0.1s; }
+    .links a:nth-child(2) { animation-delay: 0.2s; }
+    .links a:nth-child(3) { animation-delay: 0.3s; }
+
+
+    footer {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #888;
+      font-weight: 300;
+    }
+
+    footer a {
+      color: #4c00ff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    footer a:hover {
+      color: #6933ff;
+    }
+
+
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .floating-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(111, 0, 255, 0.6);
+      border-radius: 50%;
+      animation: float 8s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+
+    @keyframes fadeInUp {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .card {
+      animation: fadeInUp 1s ease-out;
+    }
+
+
+
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
-  // YouTube API
-  let player;
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-      videoId: 'XuFtFjIcHxY', // ضع هنا رابط الفيديو
-      playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0, showinfo: 0, fs: 0, iv_load_policy: 3, playsinline: 1 },
-      events: { 'onReady': onPlayerReady }
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s ease;
+  }
+
+  .link-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .icon {
+    width: 20px;  
+    height: 20px;
+    margin-right: 8px;
+    object-fit: contain;
+  } 
+
+
+    .notification {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--gradient-primary);
+      color: var(--text-primary);
+      padding: 15px 25px;
+      border-radius: 15px;
+      box-shadow: var(--shadow-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      z-index: 3000;
+      animation: slideInRight 0.5s ease;
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #4c00ff, #4c00ff);
+      box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+    }
+
+    .notification.warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: #000;
+      box-shadow: 0 8px 32px rgba(255, 193, 7, 0.3);
+    }
+
+
+  .corner-gif {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 130px; 
+    height: auto;
+    z-index: 999;
+    border: none; 
+    border-radius: 12px; 
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .corner-gif:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+
+  
+    
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px 20px;
+        margin: 10px;
+      }
+      
+      h2 {
+        font-size: 2rem;
+      }
+      
+      .avatar {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .links a {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+    }
+
+    
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+
+  <!-- إضافة ملف الصوت -->
+  <audio id="backgroundMusic" loop>
+    <source src="pinkpanther.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  
+  <video autoplay="" muted="" loop="" id="bgVideo">
+    <source src="https://190k.netlify.app/media/sus.mp4" type="video/mp4">
+  </video>
+
+
+  <div class="grid-bg"></div>
+
+
+  <div class="floating-elements" id="floatingElements"><div class="floating-dot" style="left: 92.6159%; animation-delay: 1.37655s; animation-duration: 9.35227s;"></div><div class="floating-dot" style="left: 2.12008%; animation-delay: 4.20822s; animation-duration: 10.798s;"></div><div class="floating-dot" style="left: 51.085%; animation-delay: 7.29049s; animation-duration: 11.1756s;"></div><div class="floating-dot" style="left: 88.087%; animation-delay: 2.57956s; animation-duration: 10.2347s;"></div><div class="floating-dot" style="left: 71.869%; animation-delay: 3.26669s; animation-duration: 8.59295s;"></div><div class="floating-dot" style="left: 78.6702%; animation-delay: 4.33164s; animation-duration: 11.3941s;"></div><div class="floating-dot" style="left: 50.4486%; animation-delay: 7.14653s; animation-duration: 8.78636s;"></div><div class="floating-dot" style="left: 97.9033%; animation-delay: 2.86436s; animation-duration: 9.41269s;"></div><div class="floating-dot" style="left: 63.8922%; animation-delay: 7.35563s; animation-duration: 11.7995s;"></div><div class="floating-dot" style="left: 5.17225%; animation-delay: 7.07164s; animation-duration: 9.17835s;"></div><div class="floating-dot" style="left: 23.4805%; animation-delay: 3.22056s; animation-duration: 8.11174s;"></div><div class="floating-dot" style="left: 31.1028%; animation-delay: 1.32596s; animation-duration: 8.84416s;"></div><div class="floating-dot" style="left: 86.6089%; animation-delay: 0.693331s; animation-duration: 10.0476s;"></div><div class="floating-dot" style="left: 12.3666%; animation-delay: 0.0593029s; animation-duration: 9.30921s;"></div><div class="floating-dot" style="left: 39.5573%; animation-delay: 4.88238s; animation-duration: 11.8607s;"></div></div>
+
+
+  <canvas id="mouseEffect" width="1920" height="991"></canvas>
+
+<div class="container">
+  <div class="card" style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px);">
+    <img src="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024" alt="qo Avatar" class="avatar">
+    <h2>3kawi</h2>
+    <p class="bio">Its Me 3kawi | Py,Html,Js,Css Coder</p>
+    <div class="links">
+      <a href="https://discord.gg/8J5ZFx5VUJ" target="_blank" class="link-btn">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="Discord Icon" class="icon">
+        Dis: Mr. Store
+      </a>
+      <a href="https://discord.gg/b-f" target="_blank" class="link-btn">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube Icon" class="icon">
+        Dis: Basic Fight 
+      </a>
+      <a href="https://3kawi-cfx.netlify.app" target="_blank" class="link-btn">
+        <img src="https://cdn.discordapp.com/avatars/1273500458647949326/aafde583ac2fcca92bcf0e34c893d81d.webp?size=1024" alt="Finder Icon" class="icon">
+        CFX Finder
+      </a>
+    </div>
+    <footer>
+      By <a href="https://discord.gg/8J5ZFx5VUJ"># Mr. Store !!</a>
+    </footer>
+  </div>
+</div>
+
+
+
+<div class="visitor-counter">
+  <a href="https://discord.gg/8J5ZFx5VUJ" target="_blank">
+    <img src="https://cdn.discordapp.com/attachments/1371646239145463962/1420229883354681478/Welcome.png?ex=68d54c66&is=68d3fae6&hm=312af6163da48ea9f718b59262f7f04b6d5e2de109595fb25d7c3fd1073d5b45&" title="Counter Widget" alt="Visit counter For Websites">
+  </a>
+</div>
+ 
+
+  <script>
+    // متغير لتتبع حالة تشغيل الموسيقى
+    let musicStarted = false;
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    
+    // وظيفة لبدء تشغيل الموسيقى
+    function startMusic() {
+      if (!musicStarted) {
+        backgroundMusic.play().then(() => {
+          musicStarted = true;
+        }).catch(error => {
+          console.log('خطأ في تشغيل الموسيقى:', error);
+        });
+      }
+    }
+    
+    // إضافة مستمع للنقر على الصفحة بأكملها
+    document.addEventListener('click', startMusic, { once: true });
+    
+    // إضافة مستمع للمس (للأجهزة المحمولة)
+    document.addEventListener('touchstart', startMusic, { once: true });
+    
+    // إضافة مستمع لأي حركة للفأرة
+    document.addEventListener('mousemove', startMusic, { once: true });
+    
+    // إضافة مستمع لأي ضغطة مفتاح
+    document.addEventListener('keydown', startMusic, { once: true });
+    
+    
+    const canvas = document.getElementById("mouseEffect");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particlesArray = [];
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
+
+    const mouse = {
+      x: null,
+      y: null,
+    };
+
+    window.addEventListener("mousemove", function(e) {
+      mouse.x = e.x;
+      mouse.y = e.y;
+      for (let i = 0; i < 5; i++) {
+        particlesArray.push(new Particle());
+      }
+    });
+
+    class Particle {
+      constructor() {
+        this.x = mouse.x;
+        this.y = mouse.y;
+        this.size = Math.random() * 8 + 2;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * 4 - 2;
+        this.color = `hsl(${Math.random() * 60}, 100%, ${50 + Math.random() * 50}%)`;
+        this.life = 1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.size *= 0.96;
+        this.life -= 0.01;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+        if (particlesArray[i].size < 0.3 || particlesArray[i].life <= 0) {
+          particlesArray.splice(i, 1);
+          i--;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    
+    function createFloatingDots() {
+      const container = document.getElementById('floatingElements');
+      const numberOfDots = 15;
+
+      for (let i = 0; i < numberOfDots; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'floating-dot';
+        dot.style.left = Math.random() * 100 + '%';
+        dot.style.animationDelay = Math.random() * 8 + 's';
+        dot.style.animationDuration = (8 + Math.random() * 4) + 's';
+        container.appendChild(dot);
+      }
+    }
+
+    
+    createFloatingDots();
+
+    
+    const card = document.querySelector('.card');
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = (y - centerY) / 10;
+      const rotateY = (centerX - x) / 10;
+      
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+    });
+
+    
+    const links = document.querySelectorAll('.links a');
+    links.forEach(link => {
+      link.addEventListener('click', function(e) {
+        
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x}px;
+          top: ${y}px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+          pointer-events: none;
+        `;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+
+
+
+  // تشغيل الإشعار الأصفر عند محاولة فتح DevTools
+  function showNotification(message, type = 'warning') {
+    if (document.querySelector('.notification')) return;
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `<span>${message}</span>`;
+    
+    // نضيفه أسفل يسار الشاشة بدل يمين
+    notification.style.bottom = '30px';
+    notification.style.left = '30px';
+    notification.style.right = 'auto';
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 4000);
   }
 
-  function onPlayerReady(event) {
-    event.target.setVolume(100);
-    event.target.playVideo();
+function showSecurityNotification() {
+    showNotification('not on 3kawi', 'warning');
   }
-</script>
 
-</body>
-</html>
+  // تعطيل المفاتيح الشائعة لفتح DevTools
+  document.addEventListener('keydown', function(e) {
+    if (
+      e.keyCode === 123 || // F12
+      (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I/J
+      (e.ctrlKey && e.keyCode === 85) // Ctrl+U
+    ) {
+      e.preventDefault();
+      showSecurityNotification();
+      return false;
+    }
+  });
+
+  // تعطيل النقر بزر الفأرة الأيمن
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    showSecurityNotification();
+  });
+
+
+    
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+
+
+</body></html>
